@@ -1,3 +1,5 @@
+<?php include "modal_popup.php";?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,10 +96,12 @@
         <li class="nav-item"><a class="nav-link" href="cresources.php">Culinary Resources</a></li>
         <li class="nav-item"><a class="nav-link" href="eresources.php">Educational Resources</a></li>
       </ul>
-      <a href="#" class="btn btn-warning join-btn">Join Us</a>
+      <button class="btn btn-warning join-btn" data-bs-toggle="modal" data-bs-target="#Registermodal">Join Us</button>
     </div>
   </div>
 </nav>
+
+
 <!-- End NAVBAR -->
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

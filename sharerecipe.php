@@ -1,4 +1,79 @@
-<?php include "header.php"; ?>
+<?php include "header.php"; 
+include "config.php";
+session_start();
+if (isset($_SESSION['user_id'])) {
+   $user_id= $_SESSION['user_id'];
+} 
+
+$upload_success = "";
+$error = "";
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $topic = trim($_POST['topic']);
+    $description= trim($_POST['description']);
+    $content= trim($_POST['content']);
+    $type_id= 1;
+   
+    if (isset($_FILES['uploaded_file']) && $_FILES['uploaded_file']['error'] === 0) {
+
+        /*
+        $_FILES['uploaded_file'] = [
+        'name' => 'myphoto.jpg',
+        'type' => 'image/jpeg',
+        'tmp_name' => '/tmp/phpXYZ.tmp',
+        'error' => 0,
+        'size' => 123456];      */
+        
+        $file_name = $_FILES['uploaded_file']['name'];
+        $file_type = $_FILES['uploaded_file']['type'];
+        $file_size = $_FILES['uploaded_file']['size'];
+        $file_tmp = $_FILES['uploaded_file']['tmp_name']; //temporary filename where the file is stored on the server before you move it.
+
+        // Check if file actually exists
+        if (!file_exists($file_tmp)) {
+            $error = "Temporary file not found.";
+        } else {
+            $file_data = file_get_contents($file_tmp);
+
+            if ($file_data === false) {
+                $error = "Failed to read uploaded file.";
+            } else {
+                // Validate file type
+                $allowed_types = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain', 'application/doc', 'video/mp4' , 'video/quicktime'];
+
+                if (!in_array($file_type, $allowed_types)) {
+                    $error = "Only jpg, png, files are allowed.";
+                } elseif ($file_size > 100 * 1024 * 1024) {
+                    $error = "File size must be under 100MB.";
+                } else {
+                    $stmt = mysqli_prepare($conn, "INSERT INTO resources (user_id,type_id,topic,description,content,file_name, file_type, file_size, file_data) VALUES (?,?,?,?,?,?, ?, ?, ?)");
+
+                    if ($stmt) {
+
+                        mysqli_stmt_bind_param($stmt, "iisssssis",$user_id,$type_id,$topic,$description,$content, $file_name, $file_type, $file_size, $file_data);
+                        mysqli_stmt_send_long_data($stmt, 3, $file_data);
+
+                        if (mysqli_stmt_execute($stmt)) {
+                            $upload_success = "File uploaded successfully!";
+                        } else {
+                            $error = "Failed to upload file. DB Error: " . mysqli_stmt_error($stmt);
+                        }
+
+                        mysqli_stmt_close($stmt);
+                    } else {
+                        $error = "Database prepare failed: " . mysqli_error($conn);
+                    }
+                }
+            }
+        }
+    } else {
+        $error = "Please select a valid file.";
+    }
+}
+
+?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +89,7 @@
 <div class="container py-5">
   <h1 class="mb-4 text-center">Share Your Recipe</h1>
 
-  <form action="upload.php" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+  <form action="sharerecipe.php" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
     <!-- Topic -->
     <div class="mb-3">
       <label for="title" class="form-label">Recipe Title</label>
@@ -35,8 +110,8 @@
 
     <!-- Content -->
     <div class="mb-3">
-      <label for="content" class="form-label">Recipe Content</label>
-      <textarea class="form-control" id="content" name="content" rows="6" placeholder="Write the recipe steps here..." required></textarea>
+      <label for="instruction" class="form-label">Recipe Instructions</label>
+      <textarea class="form-control" id="instruction" name="instruction" rows="6" placeholder="Write the recipe steps here..." required></textarea>
       <div class="invalid-feedback">
         Please enter the recipe content.
       </div>
@@ -44,9 +119,9 @@
 
     <!-- File Upload -->
     <div class="mb-3">
-      <label for="file" class="form-label">Upload Recipe File (optional)</label>
-      <input class="form-control" type="file" id="file" name="file" accept=".pdf,.doc,.docx,.jpg,.png">
-      <div class="form-text">You can upload PDF, DOC, or image files.</div>
+      <label for="uploaded_file" class="form-label">Upload Recipe File (optional)</label>
+      <input class="form-control" type="file" id="uploaded_file" name="uploaded_file" accept=".png,.jpeg,.jpg,.webp,.gif,.tiff">
+      <div class="form-text">You can upload recipe image files here.</div>
     </div>
 
      <!-- Category Dropdown -->
@@ -55,9 +130,13 @@
       <select class="form-select" id="category">
         <option selected disabled>Select category</option>
         <option>Appetizer</option>
-        <option>Main Course</option>
+        <option>Soup</option>
+        <option>Salad</option>
+        <option>Main Dish</option>
+        <option>Side Dish</option>
+        <option>Bread</option>
+        <option>Sauce</option>
         <option>Dessert</option>
-        <option>Snack</option>
         <option>Beverage</option>
       </select>
     </div>

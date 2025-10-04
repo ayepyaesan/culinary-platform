@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $topic = trim($_POST['topic']);
     $description= trim($_POST['description']);
     $content= trim($_POST['content']);
-    $type_id= 1;
+    $type_id= 2;
    
     if (isset($_FILES['uploaded_file']) && $_FILES['uploaded_file']['error'] === 0) {
 
@@ -86,13 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <div class="container py-5">
-  <h1 class="mb-4 text-center">Share Your Culinary Resource</h1>
+  <h1 class="mb-4 text-center">Share Your Educational Resource</h1>
   <?php if ($upload_success): ?>
         <p class="success"><?= htmlspecialchars($upload_success) ?></p>
         <?php elseif ($error): ?>
         <p class="error"><?= htmlspecialchars($error) ?></p>
   <?php endif; ?>
-  <form action="createcresource.php" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+  <form action="createeresource.php" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
     <!-- Topic -->
     <div class="mb-3">
       <label for="topic" class="form-label">Recipe Topic</label>

@@ -45,7 +45,7 @@
   <div class="container text-light">
     <h1 class="display-5 fw-bold">Educational Resources</h1>
     <p class="lead">Explore and share renewable energy knowledge: downloads, infographics & videos</p>
-    <a href="createresource.php" class="btn btn-warning btn-lg mt-3">Share Your Resource</a>
+    <a href="createeresource.php" class="btn btn-warning btn-lg mt-3">Share Your Resource</a>
   </div>
 </div>
 
